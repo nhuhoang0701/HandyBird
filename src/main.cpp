@@ -34,7 +34,7 @@ int main()
 {
 
     // create the window and set general settings. Plant the seeds
-    RenderWindow window(VideoMode(1000, 600), "Floppy Bird");
+    RenderWindow window(VideoMode(1000, 600), "Handy Bird");
     window.setFramerateLimit(60);
     window.setKeyRepeatEnabled(false);
     srand(time(0));
@@ -51,9 +51,9 @@ int main()
     } sounds;
 
     // load sounds
-    sounds.chingBuffer.loadFromFile("./audio/score.wav");
-    sounds.hopBuffer.loadFromFile("./audio/flap.wav");
-    sounds.dishkBuffer.loadFromFile("./audio/crash.wav");
+    sounds.chingBuffer.loadFromFile("../res/audio/score.wav");
+    sounds.hopBuffer.loadFromFile("../res/audio/flap.wav");
+    sounds.dishkBuffer.loadFromFile("../res/audio/crash.wav");
     sounds.ching.setBuffer(sounds.chingBuffer);
     sounds.hop.setBuffer(sounds.hopBuffer);
     sounds.dishk.setBuffer(sounds.dishkBuffer);
@@ -68,12 +68,12 @@ int main()
     } textures;
 
     // load textures
-    textures.background.loadFromFile("./images/background.png");
-    textures.pipe.loadFromFile("./images/pipe.png");
-    textures.gameover.loadFromFile("./images/gameover.png");
-    textures.flappy[0].loadFromFile("./images/flappy1.png");
-    textures.flappy[1].loadFromFile("./images/flappy2.png");
-    textures.flappy[2].loadFromFile("./images/flappy3.png");
+    textures.background.loadFromFile("../res/images/background.png");
+    textures.pipe.loadFromFile("../res/images/pipe.png");
+    textures.gameover.loadFromFile("../res/images/gameover.png");
+    textures.flappy[0].loadFromFile("../res/images/flappy1.png");
+    textures.flappy[1].loadFromFile("../res/images/flappy2.png");
+    textures.flappy[2].loadFromFile("../res/images/flappy3.png");
 
     // flappy singleton struct.
     // v = vertical speed
@@ -119,7 +119,7 @@ int main()
     } game;
 
     // load font, set positions, scales etc
-    game.font.loadFromFile("./fonts/flappy.ttf");
+    game.font.loadFromFile("../res/fonts/flappy.ttf");
     game.background[0].setTexture(textures.background);
     game.background[1].setTexture(textures.background);
     game.background[2].setTexture(textures.background);
@@ -146,6 +146,59 @@ int main()
     game.highscoreText.setFillColor(Color::White);
     game.highscoreText.move(30, 80);
 
+    VideoCapture webcam(0);
+
+    webcam.set(CAP_PROP_SETTINGS, WINDOW_AUTOSIZE);
+
+    if (!webcam.isOpened())
+    {
+        cerr << "Can't find camera! Please check your camera setting again!\n";
+        return -1;
+    }
+
+    Mat frame, frameOut, handMask, foreground, fingerCountDebug;
+
+    BackgroundRemover backgroundRemover;
+    SkinColorDetector skinDetector;
+    FaceDetector faceDetector;
+    FingerCount fingerCount;
+
+    while (true)
+    {
+        webcam >> frame;
+
+        // Flip the frame so that the image is more intuitive to see
+        flip(frame, frame, 1);
+        frameOut = frame.clone();
+
+        skinDetector.drawSkinColorGetter(frameOut);
+
+        foreground = backgroundRemover.getForeground(frame);
+
+        faceDetector.removeFaces(frame, foreground);
+        handMask = skinDetector.getSkinMask(foreground);
+        fingerCountDebug = fingerCount.findFingersCount(handMask, frameOut);
+
+        imshow("output", frameOut);
+        imshow("foreground", foreground);
+        imshow("handMask", handMask);
+        imshow("handDetection", fingerCountDebug);
+
+        int key = waitKey(1);
+
+        if (key == 113) // q
+        {
+            break;
+        }
+        else if (key == 98) // b
+        {
+            backgroundRemover.calibrate(frame);
+        }
+        else if (key == 115) // s
+        {
+            skinDetector.calibrate(frame);
+        }
+    }
     // main loop
     while (window.isOpen())
     {
@@ -153,7 +206,7 @@ int main()
         // update score
         flappy.sprite.setTexture(textures.flappy[1]);
         game.scoreText.setString(to_string(game.score));
-        game.highscoreText.setString("HI " + to_string(game.highscore));
+        game.highscoreText.setString("Record " + to_string(game.highscore));
 
         // update flappy
         float fx = flappy.sprite.getPosition().x;
@@ -165,7 +218,7 @@ int main()
         if (game.gameState == waiting || game.gameState == started)
         {
 
-            // change the texture once in 6 frames
+            // change the bird once in 6 frames
             if (game.frames % 6 == 0)
             {
                 flappy.frame += 1;
@@ -223,7 +276,7 @@ int main()
         if (game.gameState == started && game.frames % 150 == 0)
         {
             int r = rand() % 275 + 75;
-            int gap = 150;
+            int gap = 300;
 
             // lower pipe
             Sprite pipeL;
@@ -372,63 +425,6 @@ int main()
     }
 
     return 0;
+
+    return 0;
 }
-
-// int main(int, char **)
-// {
-//     VideoCapture webcam(0);
-
-//     webcam.set(CAP_PROP_SETTINGS, WINDOW_AUTOSIZE);
-
-//     if (!webcam.isOpened())
-//     {
-//         cerr << "Can't find camera! Please check your camera setting again!\n";
-//         return -1;
-//     }
-
-//     Mat frame, frameOut, handMask, foreground, fingerCountDebug;
-
-//     BackgroundRemover backgroundRemover;
-//     SkinColorDetector skinDetector;
-//     FaceDetector faceDetector;
-//     FingerCount fingerCount;
-
-//     while (true)
-//     {
-//         webcam >> frame;
-
-//         // Flip the frame so that the image is more intuitive to see
-//         flip(frame, frame, 1);
-//         frameOut = frame.clone();
-
-//         skinDetector.drawSkinColorGetter(frameOut);
-
-//         foreground = backgroundRemover.getForeground(frame);
-
-//         faceDetector.removeFaces(frame, foreground);
-//         handMask = skinDetector.getSkinMask(foreground);
-//         fingerCountDebug = fingerCount.findFingersCount(handMask, frameOut);
-
-//         imshow("output", frameOut);
-//         imshow("foreground", foreground);
-//         imshow("handMask", handMask);
-//         imshow("handDetection", fingerCountDebug);
-
-//         int key = waitKey(1);
-
-//         if (key == 113) // q
-//         {
-//             break;
-//         }
-//         else if (key == 98) // b
-//         {
-//             backgroundRemover.calibrate(frame);
-//         }
-//         else if (key == 115) // s
-//         {
-//             skinDetector.calibrate(frame);
-//         }
-//     }
-
-//     return 0;
-// }
