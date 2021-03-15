@@ -18,7 +18,7 @@ private:
 
     bool calibrated = false;
 
-    Rect skinColorSamplerRectangle1, skinColorSamplerRectangle2;
+    Rect skinColorGetterSquareUp, skinColorGetterSquareDown;
 
     void calculateThresholds(Mat sample1, Mat sample2);
     void performOpening(Mat binaryImage, int structuralElementShapde, Point structuralElementSize);
@@ -26,7 +26,7 @@ private:
 public:
     SkinColorDetector(void);
 
-    void drawSkinColorSampler(Mat input);
+    void drawSkinColorGetter(Mat input);
     void calibrate(Mat input);
     Mat getSkinMask(Mat input);
 };

@@ -39,8 +39,12 @@ include_directories(
         ${PROJECT_SOURCE_DIR}/src
 )
 
+
+## In most cases better set in the CMake cache
+
+
 if(CMAKE_VERSION VERSION_LESS "3.7.0")
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
 find_package(OpenCV REQUIRED)
@@ -55,7 +59,10 @@ file(GLOB all_SRCS
 )
 
 add_executable(QR_Scanner ${all_SRCS})
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
+find_package(SFML 2 REQUIRED COMPONENTS network audio graphics window system)
 target_link_libraries(QR_Scanner ${OpenCV_LIBS})
+target_link_libraries(QR_Scanner ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
