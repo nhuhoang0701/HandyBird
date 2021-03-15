@@ -35,7 +35,7 @@ int main()
 
     // create the window and set general settings. Plant the seeds
     RenderWindow window(VideoMode(1000, 600), "Handy Bird");
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(100);
     window.setKeyRepeatEnabled(false);
     srand(time(0));
 
@@ -50,10 +50,12 @@ int main()
         Sound dishk;
     } sounds;
 
+    string workspace = "../"; // If files cannot be read, switch between "../" and ""
+
     // load sounds
-    sounds.chingBuffer.loadFromFile("../res/audio/score.wav");
-    sounds.hopBuffer.loadFromFile("../res/audio/flap.wav");
-    sounds.dishkBuffer.loadFromFile("../res/audio/crash.wav");
+    sounds.chingBuffer.loadFromFile(workspace + string("res/audio/score.wav"));
+    sounds.hopBuffer.loadFromFile(workspace + string("res/audio/flap.wav"));
+    sounds.dishkBuffer.loadFromFile(workspace + string("res/audio/crash.wav"));
     sounds.ching.setBuffer(sounds.chingBuffer);
     sounds.hop.setBuffer(sounds.hopBuffer);
     sounds.dishk.setBuffer(sounds.dishkBuffer);
@@ -68,12 +70,12 @@ int main()
     } textures;
 
     // load textures
-    textures.background.loadFromFile("../res/images/background.png");
-    textures.pipe.loadFromFile("../res/images/pipe.png");
-    textures.gameover.loadFromFile("../res/images/gameover.png");
-    textures.flappy[0].loadFromFile("../res/images/flappy1.png");
-    textures.flappy[1].loadFromFile("../res/images/flappy2.png");
-    textures.flappy[2].loadFromFile("../res/images/flappy3.png");
+    textures.background.loadFromFile(workspace + string("res/images/background.png"));
+    textures.pipe.loadFromFile(workspace + string("res/images/pipe.png"));
+    textures.gameover.loadFromFile(workspace + string("res/images/gameover.png"));
+    textures.flappy[0].loadFromFile(workspace + string("res/images/flappy1.png"));
+    textures.flappy[1].loadFromFile(workspace + string("res/images/flappy2.png"));
+    textures.flappy[2].loadFromFile(workspace + string("res/images/flappy3.png"));
 
     // flappy singleton struct.
     // v = vertical speed
@@ -119,7 +121,7 @@ int main()
     } game;
 
     // load font, set positions, scales etc
-    game.font.loadFromFile("../res/fonts/flappy.ttf");
+    game.font.loadFromFile(workspace + string("res/fonts/flappy.ttf"));
     game.background[0].setTexture(textures.background);
     game.background[1].setTexture(textures.background);
     game.background[2].setTexture(textures.background);
@@ -162,8 +164,10 @@ int main()
     SkinColorDetector skinDetector;
     FaceDetector faceDetector;
     FingerCount fingerCount;
+    int fingerNumbers;
 
-    while (true)
+    bool isForeGroundDestroyed = false;
+    while (window.isOpen())
     {
         webcam >> frame;
 
@@ -177,31 +181,29 @@ int main()
 
         faceDetector.removeFaces(frame, foreground);
         handMask = skinDetector.getSkinMask(foreground);
-        fingerCountDebug = fingerCount.findFingersCount(handMask, frameOut);
+        fingerCountDebug = fingerCount.findFingersCount(handMask, frameOut).first;
+        fingerNumbers = fingerCount.findFingersCount(handMask, frameOut).second;
 
         imshow("output", frameOut);
-        imshow("foreground", foreground);
-        imshow("handMask", handMask);
-        imshow("handDetection", fingerCountDebug);
+        if (!isForeGroundDestroyed)
+        {
+            imshow("foreground", foreground);
+        }
+        // imshow("handMask", handMask);
+        // imshow("handDetection", fingerCountDebug);
 
         int key = waitKey(1);
 
-        if (key == 113) // q
-        {
-            break;
-        }
-        else if (key == 98) // b
+        if (key == 98) // b
         {
             backgroundRemover.calibrate(frame);
         }
         else if (key == 115) // s
         {
             skinDetector.calibrate(frame);
+            destroyWindow("foreground");
+            isForeGroundDestroyed = true;
         }
-    }
-    // main loop
-    while (window.isOpen())
-    {
 
         // update score
         flappy.sprite.setTexture(textures.flappy[1]);
@@ -356,13 +358,11 @@ int main()
         Event event;
         while (window.pollEvent(event))
         {
-
             // bye bye
             if (event.type == Event::Closed)
             {
                 window.close();
             }
-
             // flap
             else if (event.type == Event::KeyPressed &&
                      event.key.code == Keyboard::Space)
@@ -371,15 +371,14 @@ int main()
                 {
                     game.gameState = started;
                 }
-
                 if (game.gameState == started)
                 {
                     flappy.v = -8;
                     sounds.hop.play();
                 }
-
-                // restart
             }
+
+            // restart
             else if (event.type == Event::KeyPressed &&
                      event.key.code == Keyboard::C &&
                      game.gameState == gameover)
@@ -423,8 +422,6 @@ int main()
         // dont forget to update total frames
         game.frames++;
     }
-
-    return 0;
 
     return 0;
 }

@@ -4,7 +4,7 @@
 
 Rect getFaceRect(Mat input);
 
-String faceClassifierFileName = "res/data/haarcascade_frontalface_alt.xml";
+String faceClassifierFileName = "../res/data/haarcascade_frontalface_alt.xml";
 CascadeClassifier faceCascadeClassifier;
 
 FaceDetector::FaceDetector(void)

@@ -13,7 +13,7 @@
 
 cmake_minimum_required(VERSION 3.5.0)
 project(
-    QR_Scanner
+    HandyBird
     VERSION 0.1.0
     DESCRIPTION "opencv quick learning"
     LANGUAGES CXX
@@ -58,11 +58,11 @@ file(GLOB all_SRCS
 "${PROJECT_SOURCE_DIR}/src/*.c"
 )
 
-add_executable(QR_Scanner ${all_SRCS})
+add_executable(HandyBird ${all_SRCS})
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 find_package(SFML 2 REQUIRED COMPONENTS network audio graphics window system)
-target_link_libraries(QR_Scanner ${OpenCV_LIBS})
-target_link_libraries(QR_Scanner ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
+target_link_libraries(HandyBird ${OpenCV_LIBS})
+target_link_libraries(HandyBird ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
