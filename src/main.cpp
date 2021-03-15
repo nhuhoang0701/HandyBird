@@ -35,7 +35,7 @@ int main()
 
     // create the window and set general settings. Plant the seeds
     RenderWindow window(VideoMode(1000, 600), "Handy Bird");
-    window.setFramerateLimit(100);
+    window.setFramerateLimit(60);
     window.setKeyRepeatEnabled(false);
     srand(time(0));
 
@@ -51,6 +51,7 @@ int main()
     } sounds;
 
     string workspace = "../"; // If files cannot be read, switch between "../" and ""
+    // string workspace = "";
 
     // load sounds
     sounds.chingBuffer.loadFromFile(workspace + string("res/audio/score.wav"));
@@ -356,6 +357,13 @@ int main()
 
         // events
         Event event;
+        if (game.gameState == started && fingerNumbers >= 3)
+        {
+            flappy.v = -8;
+            sounds.hop.play();
+        }
+
+        std::cout << fingerNumbers << '\n';
         while (window.pollEvent(event))
         {
             // bye bye
@@ -370,11 +378,6 @@ int main()
                 if (game.gameState == waiting)
                 {
                     game.gameState = started;
-                }
-                if (game.gameState == started)
-                {
-                    flappy.v = -8;
-                    sounds.hop.play();
                 }
             }
 
