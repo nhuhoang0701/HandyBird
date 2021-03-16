@@ -26,13 +26,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-  # Docs only available if this is the main app
-find_package(Doxygen)
-if(Doxygen_FOUND)
-  add_subdirectory(docs)
-else()
-  message(STATUS "Doxygen not found, not building docs")
-endif()
+#   # Docs only available if this is the main app
+# find_package(Doxygen)
+# if(Doxygen_FOUND)
+#   add_subdirectory(docs)
+# else()
+#   message(STATUS "Doxygen not found, not building docs")
+# endif()
 
 include_directories(
         ${PROJECT_SOURCE_DIR}/include

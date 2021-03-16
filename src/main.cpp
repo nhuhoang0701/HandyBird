@@ -159,13 +159,16 @@ int main()
         return -1;
     }
 
-    Mat frame, frameOut, handMask, foreground, fingerCountDebug;
+    Mat frame, frameOut, handMask, foreground;
 
     BackgroundRemover backgroundRemover;
     SkinColorDetector skinDetector;
     FaceDetector faceDetector;
     FingerCount fingerCount;
     int fingerNumbers;
+    int sumFingers = 0;
+    int fingerCountForGame = 0;
+    const int FINGER_COUNT_MEAN = 8;
 
     bool isForeGroundDestroyed = false;
     while (window.isOpen())
@@ -182,10 +185,11 @@ int main()
 
         faceDetector.removeFaces(frame, foreground);
         handMask = skinDetector.getSkinMask(foreground);
-        fingerCountDebug = fingerCount.findFingersCount(handMask, frameOut).first;
         fingerNumbers = fingerCount.findFingersCount(handMask, frameOut).second;
+        sumFingers += fingerNumbers;
+        fingerCountForGame++;
 
-        imshow("output", frameOut);
+        imshow("camera", frameOut);
         if (!isForeGroundDestroyed)
         {
             imshow("foreground", foreground);
@@ -356,14 +360,19 @@ int main()
         }
 
         // events
-        Event event;
-        if (game.gameState == started && fingerNumbers >= 3)
+        double meanFingers = (double)(sumFingers) / FINGER_COUNT_MEAN;
+        if (fingerCountForGame == FINGER_COUNT_MEAN)
         {
-            flappy.v = -8;
-            sounds.hop.play();
+            std::cout << meanFingers << '\n';
+            if (game.gameState == started && meanFingers > 0.3)
+            {
+                flappy.v = -8;
+                sounds.hop.play();
+            }
+            sumFingers = fingerCountForGame = 0;
         }
 
-        std::cout << fingerNumbers << '\n';
+        Event event;
         while (window.pollEvent(event))
         {
             // bye bye
