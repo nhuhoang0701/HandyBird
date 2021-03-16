@@ -1,3 +1,6 @@
+#ifndef __FINGERCOUNT_H__
+#define __FINGERCOUNT_H__
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -28,3 +31,5 @@ private:
     double findPointsDistanceOnX(Point a, Point b);
     void drawVectorPoints(Mat image, vector<Point> points, Scalar color, bool with_numbers);
 };
+
+#endif // __FINGERCOUNT_H__

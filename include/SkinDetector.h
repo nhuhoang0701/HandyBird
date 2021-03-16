@@ -1,3 +1,6 @@
+#ifndef __SKINDETECTOR_H__
+#define __SKINDETECTOR_H__
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -30,3 +33,5 @@ public:
     void calibrate(Mat input);
     Mat getSkinMask(Mat input);
 };
+
+#endif // __SKINDETECTOR_H__
